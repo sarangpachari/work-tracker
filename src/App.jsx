@@ -19,10 +19,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/pending-works" element={<PendingWorks />} />
-        <Route path="/attended-works" element={<AttendedWorks />} />
-        <Route path="/completed-works" element={<CompletedWorks />} />
+        <Route path="/dashboard/:id" element={<Dashboard />} />
+        <Route path="/pending-works/:id" element={<PendingWorks />} />
+        <Route path="/attended-works/:id" element={<AttendedWorks />} />
+        <Route path="/completed-works/:id" element={<CompletedWorks />} />
         <Route path='/*' element={<Pnf />} />
       </Routes>
     <Footer />
