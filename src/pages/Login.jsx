@@ -1,6 +1,6 @@
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { auth } from '../config/firebase'
 
 const Login = () => {
@@ -28,6 +28,7 @@ const Login = () => {
         <input type="email" placeholder='Email address' onChange={(e)=>setEmail(e.target.value)} />
         <input type="password" placeholder='Password' onChange={(e)=>setPassword(e.target.value)}/>
         <button onClick={signIn}>Login</button>
+        <Link to={'/signup'}>Create Account</Link>
       </div>
     </>
   )
