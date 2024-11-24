@@ -2,9 +2,12 @@ import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../config/firebase";
+import Toast from "react-bootstrap/Toast";
+import ToastContainer from "react-bootstrap/ToastContainer";
 
 const Login = () => {
   const navigate = useNavigate();
+  const [toast, setToast] = useState({ show: false, message: "", variant: "" });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -13,6 +16,7 @@ const Login = () => {
       const uid = currentUser?.uid;
 
       if (currentUser) {
+        setToast({ show: true, message: "Welcome back !", variant: "success" });
         navigate(`/dashboard/${uid}`, { replace: true });
       } else {
         navigate("/");
@@ -27,11 +31,19 @@ const Login = () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       const uid = auth?.currentUser?.uid;
-      console.log();
-
+      setToast({
+        show: true,
+        message: "Login successfully!",
+        variant: "success",
+      });
       navigate(`/dashboard/${uid}`, { replace: true });
     } catch (error) {
-      alert("Invalid Email/Password");
+      // alert("Invalid Email/Password");
+      setToast({
+        show: true,
+        message: "Invalid Email/Password",
+        variant: "danger",
+      });
       console.error("Login failed:", error.message);
     }
   };
@@ -39,6 +51,20 @@ const Login = () => {
   return (
     <>
       <div className="d-flex justify-content-center align-items-center my-5">
+        {/* Toast Container */}
+        <ToastContainer position="top-end" className="p-3">
+          <Toast
+            onClose={() => setToast({ ...toast, show: false })}
+            show={toast.show}
+            delay={3000}
+            autohide
+            bg={toast.variant === "success" ? "success" : "danger"}
+          >
+            <Toast.Body className="text-white">{toast.message}</Toast.Body>
+          </Toast>
+        </ToastContainer>
+
+        {/* LOGIN FORM */}
         <div style={{ maxWidth: "28rem" }} className="shadow p-4">
           <div className="form-floating">
             <input

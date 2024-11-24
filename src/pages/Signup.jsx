@@ -6,9 +6,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../config/firebase";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import Toast from "react-bootstrap/Toast";
+import ToastContainer from "react-bootstrap/ToastContainer";
 
 const Signup = () => {
   const navigate = useNavigate();
+  const [toast, setToast] = useState({ show: false, message: "", variant: "" });
   const [email, setEmail] = useState("");
   const [shopName, setShopName] = useState("");
   const [password, setPassword] = useState("");
@@ -18,7 +21,8 @@ const Signup = () => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match!");
+      // alert("Passwords do not match!");
+      setToast({ show: true, message: "Passwords do not match!", variant: "danger" });
       return;
     }
 
@@ -41,7 +45,8 @@ const Signup = () => {
         allCompletedWorks: [],
       });
 
-      alert("Signup successful!");
+      // alert("Signup successful!");
+      setToast({ show: true, message: "Signup successful!", variant: "success" });
       await signInWithEmailAndPassword(auth, email, password);
       navigate(`/dashboard/${uid}`, { replace: true });
 
@@ -52,12 +57,27 @@ const Signup = () => {
       setConfirmPassword("");
     } catch (error) {
       console.error("Error signing up: ", error);
-      alert(error.message);
+      // alert(error.message);
+      setToast({ show: true, message: error.message, variant: "danger" });
     }
   };
   return (
     <>
       <div className="m-5">
+        {/* Toast Container */}
+        <ToastContainer position="top-end" className="p-3">
+          <Toast
+            onClose={() => setToast({ ...toast, show: false })}
+            show={toast.show}
+            delay={3000}
+            autohide
+            bg={toast.variant === "success" ? "success" : "danger"}
+          >
+            <Toast.Body className="text-white">{toast.message}</Toast.Body>
+          </Toast>
+        </ToastContainer>
+
+        {/* SIGNUP FORM */}
         <form onSubmit={handleSignup}>
           <div className="form-floating mb-3">
             <input
@@ -107,7 +127,9 @@ const Signup = () => {
             />
             <label for="floatingPass2">Confirm Password</label>
           </div>
-          <button className="btn btn-outline-primary w-100 mb-3" type="submit">Signup</button>
+          <button className="btn btn-outline-primary w-100 mb-3" type="submit">
+            Signup
+          </button>
         </form>
       </div>
     </>
