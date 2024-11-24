@@ -43,7 +43,7 @@ const Signup = () => {
 
       alert("Signup successful!");
       await signInWithEmailAndPassword(auth, email, password);
-      navigate(`/dashboard/${uid}`);
+      navigate(`/dashboard/${uid}`, { replace: true });
 
       // Reset form
       setEmail("");

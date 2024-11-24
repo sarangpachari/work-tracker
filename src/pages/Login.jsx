@@ -13,7 +13,7 @@ const Login = () => {
       const uid = currentUser?.uid;
 
       if (currentUser) {
-        navigate(`/dashboard/${uid}`);
+        navigate(`/dashboard/${uid}`, { replace: true });
       } else {
         navigate("/");
       }
@@ -29,7 +29,7 @@ const Login = () => {
       const uid = auth?.currentUser?.uid;
       console.log();
 
-      navigate(`/dashboard/${uid}`);
+      navigate(`/dashboard/${uid}`, { replace: true });
     } catch (error) {
       alert("Invalid Email/Password");
       console.error("Login failed:", error.message);
