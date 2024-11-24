@@ -1,37 +1,71 @@
-import { signInWithEmailAndPassword } from 'firebase/auth'
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { auth } from '../config/firebase'
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { auth } from "../config/firebase";
+import { FaGoogle } from "react-icons/fa";
 
 const Login = () => {
-  const navigate = useNavigate()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const signIn = async (e)=>{
+  const signIn = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password)
-      const uid = auth?.currentUser?.uid
+      await signInWithEmailAndPassword(auth, email, password);
+      const uid = auth?.currentUser?.uid;
       console.log();
-      
-      navigate(`/dashboard/${uid}`)
+
+      navigate(`/dashboard/${uid}`);
     } catch (error) {
-      alert("Invalid Email/Password")
+      alert("Invalid Email/Password");
       console.error("Login failed:", error.message);
     }
-  }
+  };
+
+ 
+
 
   return (
     <>
-      <div className="">
-        <input type="email" placeholder='Email address' onChange={(e)=>setEmail(e.target.value)} />
-        <input type="password" placeholder='Password' onChange={(e)=>setPassword(e.target.value)}/>
-        <button onClick={signIn}>Login</button>
-        <Link to={'/signup'}>Create Account</Link>
+      <div className="d-flex justify-content-center align-items-center my-5">
+        <div style={{ maxWidth: "28rem" }} className="shadow p-4">
+          <div className="form-floating">
+            <input
+              type="email"
+              className="form-control mt-3"
+              id="floatingInput"
+              placeholder="Email address"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <label htmlFor="floatingInput">Email address</label>
+          </div>
+          <div className="form-floating">
+            <input
+              type="password"
+              className="form-control mt-3"
+              placeholder="Password"
+              id="floatingPass"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <label htmlFor="floatingPass">Password</label>
+          </div>
+          <button className="btn btn-primary w-100 mt-3" onClick={signIn}>
+            Login
+          </button>
+
+          <Link
+            style={{ textDecoration: "none" }}
+            className="btn btn-info w-100 my-3"
+            to={"/signup"}
+          >
+            Create Account
+          </Link>
+          
+        </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

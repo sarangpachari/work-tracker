@@ -1,8 +1,6 @@
 import {
-  arrayUnion,
   doc,
   getDoc,
-  serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
@@ -38,18 +36,20 @@ const PendingWorks = () => {
     e.preventDefault();
     const docRef = doc(db, "users", id);
 
-    if (workDetails.workDescription!=="") {
+    if (workDetails.workDescription !== "") {
       try {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
           const allPendingWorks = data.allPendingWorks || [];
-  
-          const workIndex = allPendingWorks.findIndex((work) => work.id === wid);
+
+          const workIndex = allPendingWorks.findIndex(
+            (work) => work.id === wid
+          );
           if (workIndex !== -1) {
             const updatedWork = { ...workDetails };
             allPendingWorks[workIndex] = updatedWork;
-  
+
             await updateDoc(docRef, {
               allPendingWorks: allPendingWorks,
             });
@@ -69,6 +69,78 @@ const PendingWorks = () => {
         console.error("Error saving work:", error);
         alert("Failed to save work. Please try again.");
       }
+    }
+  };
+
+  const markAsAttended = async (e, work) => {
+    e.preventDefault();
+    const docRef = doc(db, "users", id);
+
+    try {
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const allPendingWorks = data.allPendingWorks || [];
+        const allAttendedWorks = data.allAttendedWorks || [];
+
+        const workIndex = allPendingWorks.findIndex((w) => w.id === work.id);
+        if (workIndex !== -1) {
+          const [attendedWork] = allPendingWorks.splice(workIndex, 1);
+
+          allAttendedWorks.push({
+            ...attendedWork,
+            attendedAt: new Date(),
+          });
+
+          await updateDoc(docRef, {
+            allPendingWorks: allPendingWorks,
+            allAttendedWorks: allAttendedWorks,
+          });
+
+          alert("Work marked as attended successfully!");
+        } else {
+          alert("Work not found in pending works.");
+        }
+      }
+    } catch (error) {
+      console.error("Error marking work as attended:", error);
+      alert("Failed to mark work as attended. Please try again.");
+    }
+  };
+
+  const markAsCompleted = async (e, work) => {
+    e.preventDefault();
+    const docRef = doc(db, "users", id);
+
+    try {
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const allPendingWorks = data.allPendingWorks || [];
+        const allCompletedWorks = data.allCompletedWorks || [];
+
+        const workIndex = allPendingWorks.findIndex((w) => w.id === work.id);
+        if (workIndex !== -1) {
+          const [completedWork] = allPendingWorks.splice(workIndex, 1);
+
+          allCompletedWorks.push({
+            ...completedWork,
+            completedAt: new Date(),
+          });
+
+          await updateDoc(docRef, {
+            allPendingWorks: allPendingWorks,
+            allCompletedWorks: allCompletedWorks,
+          });
+
+          alert("Work marked as completed successfully!");
+        } else {
+          alert("Work not found in pending works.");
+        }
+      }
+    } catch (error) {
+      console.error("Error marking work as completed:", error);
+      alert("Failed to mark work as completed. Please try again.");
     }
   };
 
@@ -127,13 +199,29 @@ const PendingWorks = () => {
                       })
                     }
                   />
-                  <button
-                    onClick={(e) => onSave(e, work?.id)}
-                    type="button"
-                    className="btn btn-success mt-2"
-                  >
-                    Save
-                  </button>
+                  <div className="d-flex flex-wrap gap-2 mt-3">
+                    <button
+                      onClick={(e) => onSave(e, work?.id)}
+                      type="button"
+                      className="btn btn-outline-danger w-100"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={(e) => markAsAttended(e, work)}
+                      type="button"
+                      className="btn btn-info w-100"
+                    >
+                      Mark as Attended
+                    </button>
+                    <button
+                      onClick={(e) => markAsCompleted(e, work)}
+                      type="button"
+                      className="btn btn-success w-100"
+                    >
+                      Mark as Completed
+                    </button>
+                  </div>
                 </div>
               </div>
             ))

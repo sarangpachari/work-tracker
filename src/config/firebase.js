@@ -3,13 +3,13 @@ import {getAuth} from 'firebase/auth';
 import {getFirestore} from 'firebase/firestore'
 
 const firebaseConfig = {
-  apiKey: "AIzaSyArDJASpomqJQqE3WYSA8izInqZnQy4VMk",
-  authDomain: "work-tracker-c6900.firebaseapp.com",
-  projectId: "work-tracker-c6900",
-  storageBucket: "work-tracker-c6900.firebasestorage.app",
-  messagingSenderId: "839508399748",
-  appId: "1:839508399748:web:4f598080194ad3cef654d1",
-  measurementId: "G-0Y6MMF794Z"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 
