@@ -7,28 +7,48 @@ const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      const uid = currentUser?.uid;
+    const unsubscribe = onAuthStateChanged(auth, (currentUser ) => {
+      const uid = currentUser ?.uid;
 
-      if (currentUser) {
+      if (currentUser ) {
         navigate(`/dashboard/${uid}`, { replace: true });
+        // Show the prompt for adding to home screen
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              console.log('User  accepted the A2HS prompt');
+            } else {
+              console.log('User  dismissed the A2HS prompt');
+            }
+            setDeferredPrompt(null);
+          });
+        }
       } else {
-        navigate("/");
+        navigate("/", { replace: true });
       }
     });
 
-    return () => unsubscribe();
-  }, []);
+    // Listen for the beforeinstallprompt event
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault(); // Prevent the mini-info bar from appearing on mobile
+      setDeferredPrompt(e); // Stash the event so it can be triggered later
+    });
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener('beforeinstallprompt', (e) => {});
+    };
+  }, [deferredPrompt]);
 
   const signIn = async (e) => {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      const uid = auth?.currentUser?.uid;
-      console.log();
-
+      const uid = auth?.currentUser ?.uid;
       navigate(`/dashboard/${uid}`, { replace: true });
     } catch (error) {
       alert("Invalid Email/Password");
