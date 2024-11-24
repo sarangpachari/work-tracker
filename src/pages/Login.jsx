@@ -1,13 +1,26 @@
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import React, { useState } from "react";
+import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../config/firebase";
-import { FaGoogle } from "react-icons/fa";
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      const uid = currentUser?.uid;
+
+      if (currentUser) {
+        navigate(`/dashboard/${uid}`);
+      } else {
+        navigate("/");
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const signIn = async (e) => {
     e.preventDefault();
@@ -22,9 +35,6 @@ const Login = () => {
       console.error("Login failed:", error.message);
     }
   };
-
- 
-
 
   return (
     <>
@@ -61,7 +71,6 @@ const Login = () => {
           >
             Create Account
           </Link>
-          
         </div>
       </div>
     </>
