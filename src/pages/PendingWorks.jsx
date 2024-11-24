@@ -1,12 +1,10 @@
-import {
-  doc,
-  getDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../config/firebase";
+import Toast from "react-bootstrap/Toast";
+import ToastContainer from "react-bootstrap/ToastContainer";
 
 const PendingWorks = () => {
   const { id } = useParams();
@@ -18,6 +16,7 @@ const PendingWorks = () => {
     customerName: "",
     customerPhone: "",
   });
+  const [toast, setToast] = useState({ show: false, message: "", variant: "" });
 
   useEffect(() => {
     fetchData();
@@ -53,7 +52,11 @@ const PendingWorks = () => {
             await updateDoc(docRef, {
               allPendingWorks: allPendingWorks,
             });
-            alert("Work updated successfully!");
+            setToast({
+              show: true,
+              message: "Work updated successfully!",
+              variant: "success",
+            });
             setWorkDetails({
               workTitle: "",
               workLocation: "",
@@ -62,12 +65,20 @@ const PendingWorks = () => {
               customerPhone: "",
             });
           } else {
-            alert("Work not found.");
+            setToast({
+              show: true,
+              message: "Work not found.",
+              variant: "danger",
+            });
           }
         }
       } catch (error) {
         console.error("Error saving work:", error);
-        alert("Failed to save work. Please try again.");
+        setToast({
+          show: true,
+          message: "Failed to save work. Please try again.",
+          variant: "danger",
+        });
       }
     }
   };
@@ -97,14 +108,26 @@ const PendingWorks = () => {
             allAttendedWorks: allAttendedWorks,
           });
 
-          alert("Work marked as attended successfully!");
+          setToast({
+            show: true,
+            message: "Work marked as attended successfully!",
+            variant: "success",
+          });
         } else {
-          alert("Work not found in pending works.");
+          setToast({
+            show: true,
+            message: "Work not found in pending works.",
+            variant: "danger",
+          });
         }
       }
     } catch (error) {
       console.error("Error marking work as attended:", error);
-      alert("Failed to mark work as attended. Please try again.");
+      setToast({
+        show: true,
+        message: "Failed to mark work as attended. Please try again.",
+        variant: "danger",
+      });
     }
   };
 
@@ -133,14 +156,26 @@ const PendingWorks = () => {
             allCompletedWorks: allCompletedWorks,
           });
 
-          alert("Work marked as completed successfully!");
+          setToast({
+            show: true,
+            message: "Work marked as completed successfully!",
+            variant: "success",
+          });
         } else {
-          alert("Work not found in pending works.");
+          setToast({
+            show: true,
+            message: "Work not found in pending works.",
+            variant: "danger",
+          });
         }
       }
     } catch (error) {
       console.error("Error marking work as completed:", error);
-      alert("Failed to mark work as completed. Please try again.");
+      setToast({
+        show: true,
+        message: "Failed to mark work as completed. Please try again.",
+        variant: "danger",
+      });
     }
   };
 
@@ -153,6 +188,21 @@ const PendingWorks = () => {
           </button>
         </Link>
         <h3>All Pending Works</h3>
+
+        {/* Toast Container */}
+        <ToastContainer position="top-end" className="p-3">
+          <Toast
+            onClose={() => setToast({ ...toast, show: false })}
+            show={toast.show}
+            delay={3000}
+            autohide
+            bg={toast.variant === "success" ? "success" : "danger"}
+          >
+            <Toast.Body className="text-white">{toast.message}</Toast.Body>
+          </Toast>
+        </ToastContainer>
+
+        {/* CARDS */}
         <div className="d-flex flex-wrap gap-3 p-3">
           {allPendingWorks?.length > 0 ? (
             allPendingWorks?.map((work, index) => (
@@ -165,7 +215,7 @@ const PendingWorks = () => {
                   Created :{" "}
                   {work?.createdAt?.toDate().toLocaleString("en-US", {
                     hour12: true,
-                  })}{" "}
+                  })}
                   <br />
                   Last Edited :{" "}
                   {work?.lastEdited?.toDate().toLocaleString("en-US", {
@@ -175,12 +225,16 @@ const PendingWorks = () => {
                 <div className="card-body">
                   <h4 className="card-title">{work?.workTitle}</h4>
                   <p className="card-text">Location : {work?.workLocation}</p>
-                  <p className="card-text">
-                    Customer Name : {work?.customerName}
-                  </p>
-                  <p className="card-text">
-                    Customer Phone : {work?.customerPhone}
-                  </p>
+                  {work?.customerName !== "Nil" && (
+                    <p className="card-text">
+                      Customer Name : {work?.customerName}
+                    </p>
+                  )}
+                  {work?.customerPhone !== "Nil" && (
+                    <p className="card-text">
+                      Customer Phone : {work?.customerPhone}
+                    </p>
+                  )}
                   <textarea
                     type="text"
                     className="form-control"

@@ -5,9 +5,12 @@ import { Link, useParams } from "react-router-dom";
 import { db } from "../config/firebase";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import Toast from 'react-bootstrap/Toast';
+import ToastContainer from 'react-bootstrap/ToastContainer';
 
 const Dashboard = () => {
   const [show, setShow] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: "", variant: "" });
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const { id } = useParams();
@@ -45,7 +48,7 @@ const Dashboard = () => {
     };
 
     if (!workDetails.workTitle || !workDetails.workLocation) {
-      alert("Please fill in Work Title and Location");
+      setToast({ show: true, message: "Please fill in Work Title and Location", variant: "danger" });
     } else {
       try {
         await updateDoc(docRef, {
@@ -55,9 +58,10 @@ const Dashboard = () => {
         // console.log("Work saved");
         setWorkDetails({});
         handleClose();
+        setToast({ show: true, message: "Work saved successfully!", variant: "success" });
       } catch (error) {
         console.error("Error saving work:", error);
-        alert("Failed to save work. Please try again.");
+        setToast({ show: true, message: "Failed to save work. Please try again.", variant: "danger" });
       }
     }
   };
@@ -71,6 +75,22 @@ const Dashboard = () => {
             Add Works
           </button>
         </div>
+
+      {/* Toast Container */}
+      <ToastContainer position="top-end" className="p-3">
+          <Toast 
+            onClose={() => setToast({ ...toast, show: false })} 
+            show={toast.show} 
+            delay={3000} 
+            autohide 
+            
+            bg={toast.variant === "success" ? "success" : "danger"}
+          >
+            <Toast.Body className="text-white">{toast.message}</Toast.Body>
+          </Toast>
+        </ToastContainer>
+
+
         {/* CARDS */}
         <div className="my-5">
           <div className="d-flex flex-wrap justify-content-center align-items-center gap-3">
@@ -80,7 +100,7 @@ const Dashboard = () => {
               style={{ textDecoration: "none" }}
             >
               <div
-                className="card text-white bg-danger mb-3 rounded-5 rounded-top-1"
+                className="card text-white bg-danger mb-3"
                 style={{ maxWidth: "20rem" }}
               >
                 <div className="card-body">
@@ -99,7 +119,7 @@ const Dashboard = () => {
               style={{ textDecoration: "none" }}
             >
               <div
-                className="card text-white bg-warning mb-3 rounded-5 rounded-top-1"
+                className="card text-white bg-warning mb-3"
                 style={{ maxWidth: "20rem" }}
               >
                 <div className="card-body">
@@ -118,7 +138,7 @@ const Dashboard = () => {
               style={{ textDecoration: "none" }}
             >
               <div
-                className="card text-white bg-success mb-3 rounded-5 rounded-top-1"
+                className="card text-white bg-success mb-3"
                 style={{ maxWidth: "20rem" }}
               >
                 <div className="card-body">

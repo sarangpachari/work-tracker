@@ -3,10 +3,13 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../config/firebase";
 import { IoIosArrowBack } from "react-icons/io";
+import Toast from "react-bootstrap/Toast";
+import ToastContainer from "react-bootstrap/ToastContainer";
 
 const CompletedWorks = () => {
   const { id } = useParams();
   const [allCompletedWorks, setAllCompletedWorks] = useState({});
+  const [toast, setToast] = useState({ show: false, message: "", variant: "" });
 
   useEffect(() => {
     fetchData();
@@ -40,13 +43,28 @@ const CompletedWorks = () => {
         });
 
         setAllCompletedWorks(updatedAllCompletedWorks);
-        alert("Work item deleted successfully!");
+        // alert("Work item deleted successfully!");
+        setToast({
+          show: true,
+          message: "Work item deleted successfully!",
+          variant: "success",
+        });
       } else {
-        alert("Document does not exist.");
+        // alert("Document does not exist.");
+        setToast({
+          show: true,
+          message: "Document does not exist.",
+          variant: "danger",
+        });
       }
     } catch (error) {
       console.error("Error deleting work item:", error);
-      alert("Failed to delete work item. Please try again.");
+      // alert("Failed to delete work item. Please try again.");
+      setToast({
+        show: true,
+        message: "Failed to delete work item. Please try again.",
+        variant: "danger",
+      });
     }
   };
   return (
@@ -58,6 +76,21 @@ const CompletedWorks = () => {
           </button>
         </Link>
         <h3>All Completed Works</h3>
+
+        {/* Toast Container */}
+        <ToastContainer position="top-end" className="p-3">
+          <Toast
+            onClose={() => setToast({ ...toast, show: false })}
+            show={toast.show}
+            delay={3000}
+            autohide
+            bg={toast.variant === "success" ? "success" : "danger"}
+          >
+            <Toast.Body className="text-white">{toast.message}</Toast.Body>
+          </Toast>
+        </ToastContainer>
+
+        {/* CARDS */}
         <div className="d-flex flex-wrap gap-3 p-3">
           {allCompletedWorks?.length > 0 ? (
             allCompletedWorks?.map((work, index) => (

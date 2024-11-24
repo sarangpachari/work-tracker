@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../config/firebase";
 import { IoIosArrowBack } from "react-icons/io";
+import Toast from "react-bootstrap/Toast";
+import ToastContainer from "react-bootstrap/ToastContainer";
 
 const AttendedWorks = () => {
   const { id } = useParams();
@@ -14,6 +16,7 @@ const AttendedWorks = () => {
     customerName: "",
     customerPhone: "",
   });
+  const [toast, setToast] = useState({ show: false, message: "", variant: "" });
 
   useEffect(() => {
     fetchData();
@@ -53,7 +56,11 @@ const AttendedWorks = () => {
             await updateDoc(docRef, {
               allAttendedWorks: updatedAllAttendedWorks,
             });
-            // alert("Work updated successfully!");
+            setToast({
+              show: true,
+              message: "Work updated successfully!",
+              variant: "success",
+            });
             setWorkDetails({
               workTitle: "",
               workLocation: "",
@@ -63,14 +70,29 @@ const AttendedWorks = () => {
             });
           } else {
             // alert("Work not found.");
+            setToast({
+              show: true,
+              message: "Work not found.",
+              variant: "danger",
+            });
           }
         }
       } catch (error) {
         console.error("Error saving work:", error);
-        alert("Failed to save work. Please try again.");
+        // alert("Failed to save work. Please try again.");
+        setToast({
+          show: true,
+          message: "Failed to save work. Please try again.",
+          variant: "danger",
+        });
       }
     } else {
-      alert("Please fill in the work description before saving.");
+      // alert("Please fill in the work description before saving.");
+      setToast({
+        show: true,
+        message: "Please fill in the work description before saving.",
+        variant: "danger",
+      });
     }
   };
 
@@ -99,14 +121,29 @@ const AttendedWorks = () => {
             allCompletedWorks: allCompletedWorks,
           });
 
-          alert("Work marked as completed successfully!");
+          // alert("Work marked as completed successfully!");
+          setToast({
+            show: true,
+            message: "Work marked as completed successfully!",
+            variant: "success",
+          });
         } else {
-          alert("Work not found in pending works.");
+          // alert("Work not found in pending works.");
+          setToast({
+            show: true,
+            message: "Work not found in pending works.",
+            variant: "danger",
+          });
         }
       }
     } catch (error) {
       console.error("Error marking work as completed:", error);
-      alert("Failed to mark work as completed. Please try again.");
+      // alert("Failed to mark work as completed. Please try again.");
+      setToast({
+        show: true,
+        message: "Failed to mark work as completed. Please try again.",
+        variant: "danger",
+      });
     }
   };
 
@@ -119,6 +156,21 @@ const AttendedWorks = () => {
           </button>
         </Link>
         <h3>All Attended Works</h3>
+
+        {/* Toast Container */}
+        <ToastContainer position="top-end" className="p-3">
+          <Toast
+            onClose={() => setToast({ ...toast, show: false })}
+            show={toast.show}
+            delay={3000}
+            autohide
+            bg={toast.variant === "success" ? "success" : "danger"}
+          >
+            <Toast.Body className="text-white">{toast.message}</Toast.Body>
+          </Toast>
+        </ToastContainer>
+
+        {/* CARDS */}
         <div className="d-flex flex-wrap gap-3 p-3">
           {allAttendedWorks?.length > 0 ? (
             allAttendedWorks?.map((work, index) => (
