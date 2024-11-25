@@ -4,22 +4,27 @@ import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../config/firebase";
 import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
+import { Spinner } from "react-bootstrap";
 
 const Login = () => {
   const navigate = useNavigate();
   const [toast, setToast] = useState({ show: false, message: "", variant: "" });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       const uid = currentUser?.uid;
 
       if (currentUser) {
         setToast({ show: true, message: "Welcome back !", variant: "success" });
         navigate(`/dashboard/${uid}`, { replace: true });
+        setLoading(false);
       } else {
         navigate("/");
+        setLoading(false);
       }
     });
 
@@ -50,6 +55,17 @@ const Login = () => {
 
   return (
     <>
+      {/* SPINNER */}
+      {loading ? (
+        <div
+          style={{ height: "100vh" }}
+          className="d-flex justify-content-center align-items-center m-5"
+        >
+          <Spinner animation="grow" size="sm" variant="dark" />
+          <Spinner animation="grow" variant="dark" />
+          <Spinner animation="grow" size="sm" variant="dark" />
+        </div>
+      ):(
       <div className="d-flex justify-content-center align-items-center my-5">
         {/* Toast Container */}
         <ToastContainer position="top-end" className="p-3">
@@ -99,6 +115,7 @@ const Login = () => {
           </Link>
         </div>
       </div>
+      )}
     </>
   );
 };

@@ -5,8 +5,9 @@ import { Link, useParams } from "react-router-dom";
 import { db } from "../config/firebase";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import Toast from 'react-bootstrap/Toast';
-import ToastContainer from 'react-bootstrap/ToastContainer';
+import Toast from "react-bootstrap/Toast";
+import ToastContainer from "react-bootstrap/ToastContainer";
+import { Spinner } from "react-bootstrap";
 
 const Dashboard = () => {
   const [show, setShow] = useState(false);
@@ -16,17 +17,20 @@ const Dashboard = () => {
   const { id } = useParams();
   const [user, setUser] = useState({});
   const [workDetails, setWorkDetails] = useState({});
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
   }, [workDetails]);
 
   const fetchData = async () => {
+    setLoading(true);
     const docRef = doc(db, "users", id);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       const data = docSnap.data();
       setUser(data);
+      setLoading(false);
     }
   };
 
@@ -48,7 +52,11 @@ const Dashboard = () => {
     };
 
     if (!workDetails.workTitle || !workDetails.workLocation) {
-      setToast({ show: true, message: "Please fill in Work Title and Location", variant: "danger" });
+      setToast({
+        show: true,
+        message: "Please fill in Work Title and Location",
+        variant: "danger",
+      });
     } else {
       try {
         await updateDoc(docRef, {
@@ -58,102 +66,120 @@ const Dashboard = () => {
         // console.log("Work saved");
         setWorkDetails({});
         handleClose();
-        setToast({ show: true, message: "Work saved successfully!", variant: "success" });
+        setToast({
+          show: true,
+          message: "Work saved successfully!",
+          variant: "success",
+        });
       } catch (error) {
         console.error("Error saving work:", error);
-        setToast({ show: true, message: "Failed to save work. Please try again.", variant: "danger" });
+        setToast({
+          show: true,
+          message: "Failed to save work. Please try again.",
+          variant: "danger",
+        });
       }
     }
   };
 
   return (
     <>
-      <div className="m-3" style={{ height: "68vh" }}>
-        <h6>Welcome to {user?.shopName} Dashboard</h6>
-        <div className="w-100  my-3">
-          <button onClick={handleShow} className="btn btn-outline-primary">
-            Add Works
-          </button>
+      {/* SPINNER */}
+      {loading ? (
+        <div
+          style={{ height: "100px" }}
+          className="d-flex justify-content-center align-items-center m-5"
+        >
+          <Spinner animation="grow" size="sm" variant="dark" />
+          <Spinner animation="grow" variant="dark" />
+          <Spinner animation="grow" size="sm" variant="dark" />
         </div>
+      ) : (
+        <div className="m-3" style={{ height: "68vh" }}>
+          <h6>Welcome to {user?.shopName} Dashboard</h6>
+          <div className="w-100  my-3">
+            <button onClick={handleShow} className="btn btn-outline-primary">
+              Add Works
+            </button>
+          </div>
+
+          {/* CARDS */}
+          <div className="my-5">
+            <div className="d-flex flex-wrap justify-content-center align-items-center gap-3">
+              {/* PENDING WORKS DIV */}
+              <Link
+                to={`/pending-works/${id}`}
+                style={{ textDecoration: "none" }}
+              >
+                <div
+                  className="card text-white bg-danger mb-3"
+                  style={{ maxWidth: "20rem" }}
+                >
+                  <div className="card-body">
+                    <h5 className="card-title">
+                      Pending Works{" "}
+                      <span className="bg-white text-primary p-2">
+                        {user?.allPendingWorks?.length}
+                      </span>
+                    </h5>
+                  </div>
+                </div>
+              </Link>
+              {/* ATTENDED WORKS DIV */}
+              <Link
+                to={`/attended-works/${id}`}
+                style={{ textDecoration: "none" }}
+              >
+                <div
+                  className="card text-white bg-warning mb-3"
+                  style={{ maxWidth: "20rem" }}
+                >
+                  <div className="card-body">
+                    <h5 className="card-title">
+                      Attended Works{" "}
+                      <span className="bg-white text-primary p-2">
+                        {user?.allAttendedWorks?.length}
+                      </span>
+                    </h5>
+                  </div>
+                </div>
+              </Link>
+              {/* COMPLETED WORKS DIV */}
+              <Link
+                to={`/completed-works/${id}`}
+                style={{ textDecoration: "none" }}
+              >
+                <div
+                  className="card text-white bg-success mb-3"
+                  style={{ maxWidth: "20rem" }}
+                >
+                  <div className="card-body">
+                    <h5 className="card-title">
+                      Completed Works{" "}
+                      <span className="bg-white text-primary p-2">
+                        {user?.allCompletedWorks?.length}
+                      </span>
+                    </h5>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Toast Container */}
       <ToastContainer position="top-end" className="p-3">
-          <Toast 
-            onClose={() => setToast({ ...toast, show: false })} 
-            show={toast.show} 
-            delay={3000} 
-            autohide 
-            
-            bg={toast.variant === "success" ? "success" : "danger"}
-          >
-            <Toast.Body className="text-white">{toast.message}</Toast.Body>
-          </Toast>
-        </ToastContainer>
-
-
-        {/* CARDS */}
-        <div className="my-5">
-          <div className="d-flex flex-wrap justify-content-center align-items-center gap-3">
-            {/* PENDING WORKS DIV */}
-            <Link
-              to={`/pending-works/${id}`}
-              style={{ textDecoration: "none" }}
-            >
-              <div
-                className="card text-white bg-danger mb-3"
-                style={{ maxWidth: "20rem" }}
-              >
-                <div className="card-body">
-                  <h5 className="card-title">
-                    Pending Works{" "}
-                    <span className="bg-white text-primary p-2">
-                      {user?.allPendingWorks?.length}
-                    </span>
-                  </h5>
-                </div>
-              </div>
-            </Link>
-            {/* ATTENDED WORKS DIV */}
-            <Link
-              to={`/attended-works/${id}`}
-              style={{ textDecoration: "none" }}
-            >
-              <div
-                className="card text-white bg-warning mb-3"
-                style={{ maxWidth: "20rem" }}
-              >
-                <div className="card-body">
-                  <h5 className="card-title">
-                    Attended Works{" "}
-                    <span className="bg-white text-primary p-2">
-                      {user?.allAttendedWorks?.length}
-                    </span>
-                  </h5>
-                </div>
-              </div>
-            </Link>
-            {/* COMPLETED WORKS DIV */}
-            <Link
-              to={`/completed-works/${id}`}
-              style={{ textDecoration: "none" }}
-            >
-              <div
-                className="card text-white bg-success mb-3"
-                style={{ maxWidth: "20rem" }}
-              >
-                <div className="card-body">
-                  <h5 className="card-title">
-                    Completed Works{" "}
-                    <span className="bg-white text-primary p-2">
-                      {user?.allCompletedWorks?.length}
-                    </span>
-                  </h5>
-                </div>
-              </div>
-            </Link>
-          </div>
-        </div>
-      </div>
+        <Toast
+          onClose={() => setToast({ ...toast, show: false })}
+          show={toast.show}
+          delay={3000}
+          autohide
+          bg={toast.variant === "success" ? "success" : "danger"}
+        >
+          <Toast.Body className="text-white">{toast.message}</Toast.Body>
+        </Toast>
+      </ToastContainer>
 
       {/* MODAL FOR ADD WORK */}
       <Modal show={show} onHide={handleClose}>
