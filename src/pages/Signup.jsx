@@ -9,6 +9,7 @@ import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
 import { Spinner } from "react-bootstrap";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -60,7 +61,6 @@ const Signup = () => {
       });
       await signInWithEmailAndPassword(auth, email, password);
       navigate(`/dashboard/${uid}`, { replace: true });
-      
 
       // Reset form
       setEmail("");
@@ -78,14 +78,7 @@ const Signup = () => {
     <>
       {/* SPINNER */}
       {loading ? (
-        <div
-          style={{ height: "100vh" }}
-          className="d-flex justify-content-center align-items-center m-5"
-        >
-          <Spinner animation="grow" size="sm" variant="dark" />
-          <Spinner animation="grow" variant="dark" />
-          <Spinner animation="grow" size="sm" variant="dark" />
-        </div>
+        <LoadingSpinner />
       ) : (
         <div className="m-5">
           {/* Toast Container */}
