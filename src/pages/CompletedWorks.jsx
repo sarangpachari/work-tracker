@@ -24,8 +24,9 @@ const CompletedWorks = () => {
     if (docSnap.exists()) {
       const data = docSnap.data();
       setAllCompletedWorks(data.allCompletedWorks);
+      setLoading(false);
     }
-    setLoading(false);
+    
   };
 
   const onDelete = async (e, wid) => {

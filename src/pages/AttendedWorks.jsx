@@ -31,8 +31,9 @@ const AttendedWorks = () => {
     if (docSnap.exists()) {
       const data = docSnap.data();
       setAllAttendedWorks(data.allAttendedWorks);
+      setLoading(false);
     }
-    setLoading(false);
+    
   };
 
   const onSave = async (e, wid) => {

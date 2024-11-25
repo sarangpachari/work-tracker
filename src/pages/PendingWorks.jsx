@@ -31,8 +31,9 @@ const PendingWorks = () => {
     if (docSnap.exists()) {
       const data = docSnap.data();
       setAllPendingWorks(data.allPendingWorks);
+      setLoading(false);
     }
-    setLoading(false);
+    
   };
 
   const onSave = async (e, wid) => {
