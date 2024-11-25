@@ -8,6 +8,7 @@ import { auth, db } from "../config/firebase";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
+import { Spinner } from "react-bootstrap";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -16,17 +17,23 @@ const Signup = () => {
   const [shopName, setShopName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSignup = async (e) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
       // alert("Passwords do not match!");
-      setToast({ show: true, message: "Passwords do not match!", variant: "danger" });
+      setToast({
+        show: true,
+        message: "Passwords do not match!",
+        variant: "danger",
+      });
       return;
     }
 
     try {
+      setLoading(true);
       // Create user with email and password
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -46,9 +53,14 @@ const Signup = () => {
       });
 
       // alert("Signup successful!");
-      setToast({ show: true, message: "Signup successful!", variant: "success" });
+      setToast({
+        show: true,
+        message: "Signup successful!",
+        variant: "success",
+      });
       await signInWithEmailAndPassword(auth, email, password);
       navigate(`/dashboard/${uid}`, { replace: true });
+      
 
       // Reset form
       setEmail("");
@@ -60,78 +72,94 @@ const Signup = () => {
       // alert(error.message);
       setToast({ show: true, message: error.message, variant: "danger" });
     }
+    setLoading(false);
   };
   return (
     <>
-      <div className="m-5">
-        {/* Toast Container */}
-        <ToastContainer position="top-end" className="p-3">
-          <Toast
-            onClose={() => setToast({ ...toast, show: false })}
-            show={toast.show}
-            delay={3000}
-            autohide
-            bg={toast.variant === "success" ? "success" : "danger"}
-          >
-            <Toast.Body className="text-white">{toast.message}</Toast.Body>
-          </Toast>
-        </ToastContainer>
+      {/* SPINNER */}
+      {loading ? (
+        <div
+          style={{ height: "100vh" }}
+          className="d-flex justify-content-center align-items-center m-5"
+        >
+          <Spinner animation="grow" size="sm" variant="dark" />
+          <Spinner animation="grow" variant="dark" />
+          <Spinner animation="grow" size="sm" variant="dark" />
+        </div>
+      ) : (
+        <div className="m-5">
+          {/* Toast Container */}
+          <ToastContainer position="top-end" className="p-3">
+            <Toast
+              onClose={() => setToast({ ...toast, show: false })}
+              show={toast.show}
+              delay={3000}
+              autohide
+              bg={toast.variant === "success" ? "success" : "danger"}
+            >
+              <Toast.Body className="text-white">{toast.message}</Toast.Body>
+            </Toast>
+          </ToastContainer>
 
-        {/* SIGNUP FORM */}
-        <form onSubmit={handleSignup}>
-          <div className="form-floating mb-3">
-            <input
-              class="form-control"
-              id="floatingEmail"
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <label for="floatingEmail">Email address</label>
-          </div>
-          <div className="form-floating mb-3">
-            <input
-              class="form-control"
-              id="floatingShop"
-              type="text"
-              placeholder="Shop Name"
-              value={shopName}
-              onChange={(e) => setShopName(e.target.value)}
-              required
-            />
-            <label for="floatingShop">Shop Name</label>
-          </div>
-          <div className="form-floating mb-3">
-            <input
-              class="form-control"
-              id="floatingPass1"
-              type="password"
-              placeholder="Create Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <label for="floatingPass1">Create Password</label>
-          </div>
-          <div className="form-floating mb-3">
-            <input
-              class="form-control"
-              id="floatingPass2"
-              type="password"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-            <label for="floatingPass2">Confirm Password</label>
-          </div>
-          <button className="btn btn-outline-primary w-100 mb-3" type="submit">
-            Signup
-          </button>
-        </form>
-      </div>
+          {/* SIGNUP FORM */}
+          <form onSubmit={handleSignup}>
+            <div className="form-floating mb-3">
+              <input
+                class="form-control"
+                id="floatingEmail"
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <label for="floatingEmail">Email address</label>
+            </div>
+            <div className="form-floating mb-3">
+              <input
+                class="form-control"
+                id="floatingShop"
+                type="text"
+                placeholder="Shop Name"
+                value={shopName}
+                onChange={(e) => setShopName(e.target.value)}
+                required
+              />
+              <label for="floatingShop">Shop Name</label>
+            </div>
+            <div className="form-floating mb-3">
+              <input
+                class="form-control"
+                id="floatingPass1"
+                type="password"
+                placeholder="Create Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <label for="floatingPass1">Create Password</label>
+            </div>
+            <div className="form-floating mb-3">
+              <input
+                class="form-control"
+                id="floatingPass2"
+                type="password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+              <label for="floatingPass2">Confirm Password</label>
+            </div>
+            <button
+              className="btn btn-outline-primary w-100 mb-3"
+              type="submit"
+            >
+              Signup
+            </button>
+          </form>
+        </div>
+      )}
     </>
   );
 };
