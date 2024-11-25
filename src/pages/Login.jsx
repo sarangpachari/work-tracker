@@ -58,7 +58,7 @@ const Login = () => {
       {/* SPINNER */}
       {loading ? (
         <div
-          style={{ height: "100vh" }}
+          style={{ height: "100px" }}
           className="d-flex justify-content-center align-items-center m-5"
         >
           <Spinner animation="grow" size="sm" variant="dark" />
